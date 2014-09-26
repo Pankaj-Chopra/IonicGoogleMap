@@ -22,6 +22,7 @@
     </style>
 </head>
 <body ng-controller="MapCtrl">
+    <!--Title Name in Header-->
     <ion-header-bar class="bar-dark">
         <h1 class="title">Map</h1>
     </ion-header-bar>
@@ -30,31 +31,31 @@
         <br />
         <br />
 
-        <!--Text Boxes for From and To to get the directions-->
+        <!--Text Boxes for From Source and To Destination to get the directions-->
         <div>
             <div style="margin-top: -44px;">Source:&nbsp;&nbsp;<input type="text" id="txtSrc" style="border:1px solid;width:250px;margin-left: 3px;" /></div>
             <div>
                 Destination: &nbsp;&nbsp;<input type="text" id="txtDes" style="border:1px solid;width:250px;margin-left: 3px;" />
             </div><div><input type="button" value="Get Directions" id="BtnClk" style="margin-top: 11px;margin-left: 3px;" /></div>
         </div>
-
+        <!--To display the Map-->
         <div id="map" data-tap-disabled="true" style="margin-top: 10px;"></div>
     </ion-content>
-    <ion-footer-bar class="bar-dark">
-        <!--<a ng-click="centerOnMe()" class="button button-icon icon ion-navigate">Find Me</a>-->
-    </ion-footer-bar>
+   
 </body>
 </html>
+<!--Script Functions to get the latitude and longitude of source and destination-->
 <script>
 
     angular.module('ionic.example', ['ionic'])
 
     .controller('MapCtrl', function ($scope, $ionicLoading, $compile) {
-        var toll_details = '[]';
-        var all_tolls = JSON.parse(toll_details);
+        var directionPoints = '[]';
+        var route = JSON.parse(directionPoints);
         var directionsDisplay;
         var directionsService = new google.maps.DirectionsService();
         var map, response, marker;
+        //To show the initial map at some location
         function initialize() {
 
             var myLatlng = new google.maps.LatLng(35.890026, -5.523652);
@@ -74,17 +75,17 @@
 
 
 
-
-        function finding(all_tolls) {
-            for (i = 0; i < all_tolls.length; i++) {
+        //Getting the co-ordinates of locations
+        function finding(route) {
+            for (i = 0; i < route.length; i++) {
                 var marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(all_tolls[i].latitude, all_tolls[i].longitude),
+                    position: new google.maps.LatLng(route[i].latitude, route[i].longitude),
                     map: map
                 });
             }
         }
         $(document).ready(function () {
-
+            //Getting the location names
             $('#BtnClk').click(function () {
 
                 var start = $('#txtSrc').val();
@@ -100,10 +101,12 @@
                     travelMode: google.maps.TravelMode.DRIVING,
                     unitSystem: google.maps.UnitSystem.METRIC
                 };
+                //Showing Loader so while the map is locating the A and B Points
                 $scope.loading = $ionicLoading.show({
                     content: 'Getting current location...',
                     showBackdrop: false
                 });
+
                 directionsService.route(request, function (response, status) {
 
                     if (status == google.maps.DirectionsStatus.OK) {
@@ -111,7 +114,7 @@
                         $scope.loading.hide();
                     }
                 });
-                finding(all_tolls)
+                finding(route)
             });
         });
     });
